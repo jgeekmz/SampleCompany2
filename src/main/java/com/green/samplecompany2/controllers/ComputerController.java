@@ -1,5 +1,6 @@
 package com.green.samplecompany2.controllers;
 
+import com.green.samplecompany2.exception.ComputerExceptionNotFound;
 import com.green.samplecompany2.models.Computer;
 import com.green.samplecompany2.services.ComputerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,19 +10,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author zlatkov
+ * @since 27.08.2021
  */
+
 @RestController
 public class ComputerController {
 
     @Autowired
     private ComputerService pcService;
 
-    /** Create PC. */
-    @PostMapping(path="/createPC",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    /** Find PC by id.
+     * @return*/
+    @GetMapping("/api/computers/findPC/{id}")
+    public Computer findPC(@PathVariable Integer id) {
+        return pcService.findPC(id).orElseThrow(() -> new ComputerExceptionNotFound(id));
+    }
+
+    /** Find all PCs in db. */
+    @GetMapping("/api//computers/findAll")
+    public List<Computer> findAllPCs(){
+        return pcService.findAllPCs();
+    }
+
+    /** Create PC in db. */
+    @PostMapping(path="/api//computers/createPC",consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+            MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Computer> saveComputers(@RequestBody Computer computer) throws Exception {
         Computer pc = pcService.saveComputer(computer);
         if (pc == null) {
@@ -31,28 +47,44 @@ public class ComputerController {
         }
     }
 
-    /** Find PC by id. */
-    @GetMapping("/findPC/{id}")
-    public ResponseEntity<Computer> findPC(@PathVariable Long id) {
-        Optional<Computer> pc = pcService.findPC(id);
-        return new ResponseEntity<>(pc.get(), HttpStatus.OK);
+    /** Delete PC from db. */
+    @DeleteMapping("/api/computers/delete/{id}")
+    void deleteCompuer(@PathVariable Integer id) {
+        pcService.deleteById(id);
     }
 
-    /** Find all PCs. */
-    @GetMapping("/findAll")
-    public List<Computer> findAllPCs(){
-        return pcService.findAllPCs();
+    /** Update a computer in db. */
+    @PutMapping("/api/computers/update/{id}")
+    Computer replaceComputer(@RequestBody Computer newPc, @PathVariable Integer id){
+        return pcService.findPC(id)
+                .map(pc -> {
+                    pc.setComputerName(newPc.getComputerName());
+                    pc.setDescription(newPc.getDescription());
+                    pc.setEmployeeAbbreviation(newPc.getEmployeeAbbreviation());
+                    pc.setIpAddress(newPc.getIpAddress());
+                    pc.setMacAddress(newPc.getMacAddress());
+                    return pcService.saveComputer(pc);
+                }).orElseGet(() -> {
+                    newPc.setId(id);
+                    return pcService.saveComputer(newPc);
+                });
     }
 
-    /** Delete PC. */
-    //TODO
+    /** Remove PC from Employee object. */
+    @PutMapping("/api/computers/remove/{id}")
+    Computer removeComputerFromEmployee(@RequestBody Computer newPc, @PathVariable Integer id){
+        return pcService.findPC(id)
+                .map(pc -> {
+                    pc.setEmployeeAbbreviation(newPc.getEmployeeAbbreviation());
+                    return pcService.saveComputer(pc);
+                }).orElseGet(() -> {
+                    newPc.setId(id);
+                    return pcService.saveComputer(newPc);
+                });
+    }
 
 
-    /** Remove PC from Employee. */
-
-
-    //
-    // Helper Method
+    /** Helper Method */
     private Computer createPC(){
         Computer pc = new Computer();
         pc.setComputerName("PC Test");

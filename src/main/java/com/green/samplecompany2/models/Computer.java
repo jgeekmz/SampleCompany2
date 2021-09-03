@@ -12,6 +12,7 @@ import javax.validation.constraints.Size;
  * @author zlatkov
  * @since 27.08.2021
  */
+
 @Entity(name = "computer")
 public class Computer {
 
@@ -83,13 +84,8 @@ public class Computer {
 
     @Override public String toString() {
         return "Computer{" +
-                "id=" + id +
-                ", macAddress='" + macAddress + '\'' +
-                ", computerName='" + computerName + '\'' +
-                ", ipAddress='" + ipAddress + '\'' +
-                ", employeeAbbreviation='" + employeeAbbreviation + '\'' +
-                ", description='" + description + '\'' +
-                '}';
+                "id=" + id + ", macAddress='" + macAddress + '\'' + ", computerName='" + computerName + '\'' + ", employeeAbbreviation='" + employeeAbbreviation + '\'' +
+                ", description='" + description + '\'' + '}';
     }
 
     @Override public boolean equals(Object o) {

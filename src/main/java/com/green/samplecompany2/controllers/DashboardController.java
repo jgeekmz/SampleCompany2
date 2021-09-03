@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author zlatkov
+ * @since 27.08.2021
  */
+
 @Controller
 @Slf4j
 public class DashboardController {

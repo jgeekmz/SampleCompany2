@@ -13,28 +13,35 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author zlatkov
+ * @since 27.08.2021
  */
+
+@Slf4j
 @Controller
 public class EmployeeController {
 
     @Autowired
     private EmployeeService empService;
 
-    @PostMapping(path="/employees",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    /** Create employee in db.  */
+    @PostMapping(path="/api/employees/createEmployee",consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+            MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Employee> savePC(@RequestBody Employee employee) throws Exception {
         Employee emp = empService.saveEmployee(employee);
         if (emp == null) {
             throw new Exception();
         } else {
-            ResponseEntity<Employee> tResponseEntity = new ResponseEntity<>(emp,
-                    HttpStatus.CREATED);
+            ResponseEntity<Employee> tResponseEntity = new ResponseEntity<>(emp, HttpStatus.CREATED);
             return tResponseEntity;
         }
     }
 
-    @GetMapping("/findAllPCsForEmployee/{id}")
+    /** Find all computers linked to one Employee Object. */
+    @GetMapping("/api/findAllPCsForEmployee/{id}")
     public ResponseEntity<List<Computer>> findAllPCsForEmployee(@PathVariable Integer id) {
         Employee emp = empService.findAllPCs(id);
         List<Computer> computers = new ArrayList<>();
@@ -43,10 +50,11 @@ public class EmployeeController {
             computers.add(emp.getComputersToEmployee().get(i));
         }
 
-        return new ResponseEntity<List<Computer>>(computers, HttpStatus.OK);
+        return new ResponseEntity<>(computers, HttpStatus.OK);
     }
 
-    @PostMapping("/delete/computers/{empID}/{pcID}")
+    /** Delete Computer mapped to an Employee. */
+    @PostMapping("/api/delete/computers/{empID}/{pcID}")
     public ResponseEntity removePcFromEmployee(@PathVariable (name="empID") Integer id, @PathVariable (name="pcID") Integer pcID) {
         Employee emp = empService.findAllPCs(id);
         List<Computer> pc = emp.getComputersToEmployee();
