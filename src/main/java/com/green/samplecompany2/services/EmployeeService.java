@@ -5,6 +5,8 @@ import com.green.samplecompany2.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EmployeeService {
 
@@ -17,5 +19,9 @@ public class EmployeeService {
 
     public Employee findAllPCs(Integer id){
         return employeeRepository.findById(id);
+    }
+
+    public List<Employee> findAllEmployee(){
+        return employeeRepository.findAll();
     }
 }
